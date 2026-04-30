@@ -9,6 +9,10 @@
 </head>
 <body>
   <header class="topbar">
+    <button id="navBack" class="nav-back" hidden aria-label="回到主畫面">
+      <span class="arrow">←</span>
+      <span class="text">回主畫面</span>
+    </button>
     <div class="brand">
       <span id="aiStatus" class="brand-status checking" role="button" tabindex="0" title="AI 連線狀態（點擊重新檢查）">
         <span class="dot"></span>
@@ -58,8 +62,7 @@
 
     <!-- 塔羅抽牌 -->
     <section class="screen" data-screen="tarot">
-      <button class="back-btn" data-back>← 回到主畫面</button>
-      <h2 class="screen-title">今天想問什麼呢？</h2>
+<h2 class="screen-title">今天想問什麼呢？</h2>
       <div id="tarotStage" class="tarot-stage">
         <div class="card-back" id="cardBack">
           <div class="card-back-pattern">✨ 🌙 ✨</div>
@@ -87,8 +90,7 @@
 
     <!-- 聊聊天 -->
     <section class="screen" data-screen="chat">
-      <button class="back-btn" data-back>← 回到主畫面</button>
-      <h2 class="screen-title">和亞澤聊聊</h2>
+<h2 class="screen-title">和亞澤聊聊</h2>
       <div id="chatLog" class="chat-log" aria-live="polite"></div>
       <div class="mood-grid" id="moodGrid">
         <button class="mood-btn" data-mood="開心">😊 我很開心</button>
@@ -111,16 +113,14 @@
 
     <!-- 今日任務 -->
     <section class="screen" data-screen="task">
-      <button class="back-btn" data-back>← 回到主畫面</button>
-      <h2 class="screen-title">今天的小任務</h2>
+<h2 class="screen-title">今天的小任務</h2>
       <div id="taskList" class="task-list"></div>
       <button id="newTaskBtn" class="big-btn primary">🎲 換一個任務</button>
     </section>
 
     <!-- 祝福牆 -->
     <section class="screen" data-screen="wish">
-      <button class="back-btn" data-back>← 回到主畫面</button>
-      <h2 class="screen-title">心願祝福牆</h2>
+<h2 class="screen-title">心願祝福牆</h2>
       <div class="wish-compose">
         <input id="wishName" class="chat-text" placeholder="您的稱呼（例如：阿嬤）" maxlength="10" />
         <textarea id="wishText" class="wish-text" placeholder="寫下您的心願或祝福…" maxlength="80"></textarea>

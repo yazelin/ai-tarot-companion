@@ -60,10 +60,42 @@ input, textarea {
   z-index: 10;
 }
 
+.nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  color: var(--primary);
+  font-size: 0.95em;
+  font-weight: 500;
+  margin-right: 8px;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.nav-back[hidden] { display: none; }
+.nav-back:hover {
+  border-color: var(--primary-soft);
+  background: var(--bg-soft);
+}
+.nav-back .arrow {
+  font-size: 1.2em;
+  line-height: 1;
+}
+
 .brand {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex: 1;                          /* nav-back 出現時 brand 自動讓位 */
+  min-width: 0;
+}
+.brand h1 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .brand-emoji {
@@ -642,6 +674,10 @@ main {
   .brand { gap: 6px; }
   .brand h1 { font-size: 0.95em; }
   .brand-emoji { font-size: 1.3em; }
+  /* 手機上返回鈕只顯示箭頭，省空間 */
+  .nav-back { padding: 8px 10px; margin-right: 4px; }
+  .nav-back .text { display: none; }
+  .nav-back .arrow { font-size: 1.3em; }
 
   .topbar-actions { gap: 4px; }
   .icon-btn { padding: 8px 10px; }

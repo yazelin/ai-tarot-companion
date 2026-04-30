@@ -15,6 +15,8 @@
   // ---------- 畫面切換 ----------
   function showScreen(name) {
     $$('.screen').forEach(s => s.classList.toggle('active', s.dataset.screen === name));
+    const back = $('#navBack');
+    if (back) back.hidden = (name === 'home');
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (name !== 'chat') VoiceService.stop();
     if (name === 'task') renderTasks();
@@ -26,7 +28,7 @@
   function setAIStatus(state, label) {
     const el = $('#aiStatus');
     if (!el) return;
-    el.className = `ai-status ${state}`;
+    el.className = `brand-status ${state}`;
     el.querySelector('.label').textContent = label;
     const titles = {
       online: 'AI 連線中：智慧對話可用',
@@ -401,9 +403,9 @@
 
   // ---------- 事件綁定 ----------
   function bind() {
-    // 主選單
+    // 主選單與導覽
     $$('.menu-card').forEach(b => b.addEventListener('click', () => showScreen(b.dataset.go)));
-    $$('[data-back]').forEach(b => b.addEventListener('click', () => showScreen('home')));
+    $('#navBack').addEventListener('click', () => showScreen('home'));
 
     // Topbar
     $('#voiceToggle').addEventListener('click', () => { VoiceService.toggle(); syncVoiceButton(); });
