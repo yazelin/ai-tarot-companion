@@ -132,10 +132,16 @@
   function appendBubble(side, text) {
     const wrap = document.createElement('div');
     wrap.className = `chat-bubble ${side}`;
+    const senderName = side === 'user' ? '您' : '亞澤';
+    const avatarEmoji = side === 'user' ? '🧓' : '🌷';
     wrap.innerHTML = `
-      <div class="avatar">${side === 'user' ? '🧓' : '🌷'}</div>
-      <div class="text"></div>
+      <div class="avatar">${avatarEmoji}</div>
+      <div class="bubble-body">
+        <div class="sender"></div>
+        <div class="text"></div>
+      </div>
     `;
+    wrap.querySelector('.sender').textContent = senderName;
     wrap.querySelector('.text').textContent = text;
     const log = $('#chatLog');
     log.appendChild(wrap);
@@ -446,7 +452,7 @@
     $('#greeting').textContent = AIChat.greeting();
 
     // 預設聊天頁第一句 AI 招呼
-    appendBubble('ai', '您好！我是您的陪伴小幫手。今天感覺怎麼樣呢？您可以按下面的按鈕，或直接打字告訴我。');
+    appendBubble('ai', '您好，我是亞澤，您的陪伴小幫手。今天感覺怎麼樣呢？您可以按下面的按鈕，或直接打字告訴我。');
 
     seedWishesIfEmpty();
     renderWishes();

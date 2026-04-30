@@ -410,11 +410,32 @@ main {
   background: var(--accent-soft);
 }
 
+.chat-bubble .bubble-body {
+  display: flex;
+  flex-direction: column;
+  max-width: 75%;
+}
+
+.chat-bubble.user .bubble-body {
+  align-items: flex-end;
+}
+
+.chat-bubble .sender {
+  font-size: 0.72em;
+  color: var(--ink-soft);
+  margin: 0 4px 4px;
+  letter-spacing: 1px;
+}
+
+.chat-bubble.ai .sender {
+  color: var(--primary);
+  font-weight: bold;
+}
+
 .chat-bubble .text {
   background: var(--bg-soft);
   padding: 12px 18px;
   border-radius: 14px;
-  max-width: 75%;
   line-height: 1.6;
 }
 
