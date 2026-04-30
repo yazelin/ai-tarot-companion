@@ -330,14 +330,13 @@
   function setMicUI(mode) {
     const btn = $('#micBtn');
     btn.classList.toggle('primary', mode === 'recording');
-    const emoji = btn.querySelector('.emoji');
-    if (mode === 'recording') {
-      btn.innerHTML = '<span class="emoji">🔴</span> 正在聽… 點一下結束';
-    } else if (mode === 'thinking') {
-      btn.innerHTML = '<span class="emoji">⏳</span> 辨識中…';
-    } else {
-      btn.innerHTML = '<span class="emoji">🎤</span> 按一下說話';
-    }
+    const map = {
+      recording: ['🔴', '正在聽… 點一下結束'],
+      thinking: ['⏳', '辨識中…'],
+      idle: ['🎤', '按一下說話']
+    };
+    const [emoji, text] = map[mode] || map.idle;
+    btn.innerHTML = `<span class="emoji">${emoji}</span><span class="btn-text"> ${text}</span>`;
   }
 
   let webRec = null;
@@ -409,6 +408,17 @@
     // Topbar
     $('#voiceToggle').addEventListener('click', () => { VoiceService.toggle(); syncVoiceButton(); });
     $('#fontToggle').addEventListener('click', cycleFontSize);
+    $('#aiStatus').addEventListener('click', () => {
+      const cur = $('#aiStatus').className.split(' ')[1] || '';
+      const labels = {
+        online: '✅ AI 連線中：智慧對話可用',
+        offline: '⚠️ 離線模式：對話走規則式回覆',
+        error: '❌ 連線失敗：正在重新檢查…',
+        checking: '⏳ 檢查中…'
+      };
+      toast(labels[cur] || '正在檢查…');
+      checkAIStatus();
+    });
 
     // 塔羅
     $('#drawBtn').addEventListener('click', drawCard);

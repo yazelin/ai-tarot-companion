@@ -107,25 +107,28 @@ input, textarea {
   font-size: 1.2em;
 }
 
-/* AI 狀態小燈 */
+/* AI 狀態小燈 — 只一個圓點，點擊重新檢查連線 */
 .ai-status {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  background: var(--card);
-  border: 2px solid var(--line);
-  border-radius: 14px;
-  font-size: 0.85em;
-  color: var(--ink-soft);
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
   user-select: none;
+  border-radius: 50%;
+  transition: background 0.2s;
 }
+.ai-status:hover { background: rgba(124, 95, 184, 0.08); }
+.ai-status .label { display: none; }    /* 文字一律隱藏 */
 .ai-status .dot {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: #c5c0d0;
-  box-shadow: 0 0 0 0 currentColor;
 }
 .ai-status.online .dot {
   background: #34c759;
@@ -134,10 +137,6 @@ input, textarea {
 .ai-status.offline .dot { background: #ffaa33; }
 .ai-status.error   .dot { background: #ff5b5b; }
 .ai-status.checking .dot { background: #c5c0d0; animation: pulse 1s infinite; }
-
-.ai-status.online  { color: #2a7a3d; border-color: #cdebd3; }
-.ai-status.offline { color: #a0651a; border-color: #ffe1b3; }
-.ai-status.error   { color: #a02828; border-color: #f8c8c8; }
 
 @keyframes pulse {
   0%   { box-shadow: 0 0 0 0   rgba(52,199,89,0.5); }
@@ -621,13 +620,46 @@ main {
   transform: translateX(-50%) translateY(0);
 }
 
-/* Responsive */
-@media (max-width: 600px) {
-  :root { --base: 19px; }
-  .topbar { padding: 12px 16px; }
-  .brand h1 { font-size: 1.1em; }
-  .icon-btn .label { display: none; }
-  main { padding: 20px 14px 80px; }
-  .menu-card { min-height: 160px; padding: 24px 16px; }
-  .card-back, .card-front { width: 180px; height: 260px; }
+/* ---------- Responsive ---------- */
+
+/* 平板 / 中尺寸（≤768px） */
+@media (max-width: 768px) {
+  :root { --base: 20px; }
+  .topbar { padding: 12px 16px; gap: 10px; }
+  .brand h1 { font-size: 1.05em; letter-spacing: 0.5px; }
+  .icon-btn .label { display: none; }      /* 字體/語音只留 emoji */
+  .icon-btn { padding: 10px 12px; min-width: 44px; justify-content: center; }
+  main { padding: 22px 16px 80px; }
+}
+
+/* 手機（≤480px） */
+@media (max-width: 480px) {
+  :root { --base: 18px; }
+  .topbar { padding: 10px 12px; gap: 6px; }
+  .brand { gap: 6px; }
+  .brand h1 { font-size: 0.95em; }
+  .brand-emoji { font-size: 1.3em; }
+
+  .topbar-actions { gap: 4px; }
+  .icon-btn { padding: 8px 10px; }
+  .icon-btn .icon { font-size: 1.15em; }
+
+  main { padding: 18px 12px 80px; }
+  .menu-card { min-height: 140px; padding: 20px 14px; }
+  .menu-emoji { font-size: 2.6em; }
+  .card-back, .card-front { width: 170px; height: 250px; }
+
+  /* 聊天輸入列：手機上把麥克風按鈕縮成只剩 emoji */
+  .chat-input-row { gap: 8px; }
+  .chat-text { flex: 1 1 0; min-width: 0; }
+  .big-btn { padding: 14px 18px; }
+  #micBtn .emoji { font-size: 1.4em; }
+
+  /* 心情按鈕兩欄 */
+  .mood-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .mood-btn { padding: 12px 8px; font-size: 0.9em; }
+
+  /* 塔羅卡片動作鈕排成一欄 */
+  .card-actions { flex-direction: column; width: 100%; }
+  .card-actions .big-btn { width: 100%; justify-content: center; }
 }
