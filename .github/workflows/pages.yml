@@ -27,9 +27,11 @@ jobs:
             --exclude='.git' \
             --exclude='.github' \
             --exclude='server' \
+            --exclude='worker' \
             --exclude='node_modules' \
             ./ _site/
           touch _site/.nojekyll
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

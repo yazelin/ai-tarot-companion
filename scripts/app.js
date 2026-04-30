@@ -472,5 +472,12 @@
     bind();
   }
 
+  // Service Worker：網路優先，永遠拿最新檔；離線時退回快取
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW failed:', err));
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', init);
 })();
