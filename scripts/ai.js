@@ -29,9 +29,10 @@ window.AIChat = (() => {
   // 後端需提供 /api/chat 代理（避免在前端暴露金鑰）
   // 走 Cloudflare Worker /chat（fallback chain：Groq → OpenRouter → Gemini）
   // 沒設定 CHAT_API_URL 就退回規則式回覆
+  // 回傳 { reply, from: 'ai' | 'fallback', provider? }
   async function askClaude({ message, history = [], lastCard = null, recentMood = null } = {}) {
     const url = window.CHAT_API_URL || window.CLAUDE_PROXY_URL;
-    if (!url) return freeTextReply(message);
+    if (!url) return { reply: freeTextReply(message), from: 'fallback' };
     try {
       const res = await fetch(url, {
         method: 'POST',
@@ -40,10 +41,11 @@ window.AIChat = (() => {
       });
       if (!res.ok) throw new Error(`chat ${res.status}`);
       const data = await res.json();
-      return data.reply || freeTextReply(message);
+      if (data.reply) return { reply: data.reply, from: 'ai', provider: data.provider };
+      return { reply: freeTextReply(message), from: 'fallback' };
     } catch (e) {
       console.warn('askClaude failed, falling back:', e);
-      return freeTextReply(message);
+      return { reply: freeTextReply(message), from: 'fallback' };
     }
   }
 

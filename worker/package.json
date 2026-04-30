@@ -1,0 +1,15 @@
+{
+  "name": "worker",
+  "version": "1.0.0",
+  "description": "提供 `/chat`（LLM 對話，含 fallback 鏈）與 `/transcribe`（Groq Whisper 語音辨識）兩條 API。",
+  "main": "worker.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "opencc-js": "^1.3.0"
+  }
+}

@@ -22,6 +22,40 @@
     if (name === 'tarot') resetTarotStage();
   }
 
+  // ---------- AI 連線狀態 ----------
+  function setAIStatus(state, label) {
+    const el = $('#aiStatus');
+    if (!el) return;
+    el.className = `ai-status ${state}`;
+    el.querySelector('.label').textContent = label;
+    const titles = {
+      online: 'AI 連線中：智慧對話可用',
+      offline: '離線模式：對話走規則式回覆',
+      error: '連線失敗：請檢查網路',
+      checking: '檢查中…'
+    };
+    el.title = titles[state] || '';
+  }
+
+  async function checkAIStatus() {
+    const url = window.CHAT_API_URL;
+    if (!url) { setAIStatus('offline', '離線模式'); return; }
+    try {
+      const healthUrl = url.replace(/\/chat$/, '/health');
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 5000);
+      const res = await fetch(healthUrl, { signal: ctrl.signal });
+      clearTimeout(t);
+      if (!res.ok) throw new Error('health bad');
+      const data = await res.json();
+      const anyUp = data.providers && Object.values(data.providers).some(Boolean);
+      if (anyUp) setAIStatus('online', 'AI 連線中');
+      else setAIStatus('offline', '離線模式');
+    } catch {
+      setAIStatus('error', '連線失敗');
+    }
+  }
+
   // ---------- Toast ----------
   function toast(text, ms = 2000) {
     const el = $('#toast');
@@ -121,14 +155,16 @@
     appendBubble('user', text.trim());
     $('#chatText').value = '';
     await new Promise(r => setTimeout(r, 200));
-    const reply = await AIChat.askClaude({
+    const result = await AIChat.askClaude({
       message: text,
       history: recentChatHistory(),
       lastCard: lastCard?.name || null,
       recentMood: lastMood || null
     });
-    appendBubble('ai', reply);
-    VoiceService.speak(reply);
+    appendBubble('ai', result.reply);
+    VoiceService.speak(result.reply);
+    setAIStatus(result.from === 'ai' ? 'online' : 'error',
+                result.from === 'ai' ? 'AI 連線中' : '連線失敗');
   }
 
   let lastMood = null;
@@ -139,14 +175,16 @@
     // 若有 Worker 後端 → 用 LLM 回覆，能延續上下文；否則退回規則式
     if (window.CHAT_API_URL || window.CLAUDE_PROXY_URL) {
       await new Promise(r => setTimeout(r, 200));
-      const reply = await AIChat.askClaude({
+      const result = await AIChat.askClaude({
         message: `我今天感覺有點${mood}`,
         history: recentChatHistory(),
         lastCard: lastCard?.name || null,
         recentMood: mood
       });
-      appendBubble('ai', reply);
-      VoiceService.speak(reply);
+      appendBubble('ai', result.reply);
+      VoiceService.speak(result.reply);
+      setAIStatus(result.from === 'ai' ? 'online' : 'error',
+                  result.from === 'ai' ? 'AI 連線中' : '連線失敗');
     } else {
       const reply = AIChat.moodReply(mood);
       setTimeout(() => { appendBubble('ai', reply); VoiceService.speak(reply); }, 250);
@@ -413,6 +451,7 @@
     seedWishesIfEmpty();
     renderWishes();
     renderTasks();
+    checkAIStatus();
 
     bind();
   }

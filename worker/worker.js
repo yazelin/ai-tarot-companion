@@ -7,6 +7,16 @@
 // 機密：在 dashboard 或 wrangler secret 設定
 //   GROQ_API_KEY, OPENROUTER_API_KEY, GEMINI_API_KEY（任一都可，越多越穩）
 
+import * as OpenCC from 'opencc-js/cn2t';
+
+// 簡轉繁（台灣慣用詞 s2twp）— 全域快取，每次冷啟動只建一次
+let _s2tw = null;
+function toTraditional(s) {
+  if (!s) return s;
+  if (!_s2tw) _s2tw = OpenCC.Converter({ from: 'cn', to: 'twp' });
+  return _s2tw(s);
+}
+
 const SYSTEM_PROMPT = `你是社區據點的 AI 陪伴員，名字叫「小溫」。陪伴對象是 65-90 歲的台灣長者。
 
 【說話風格】
@@ -141,7 +151,7 @@ async function handleChat(req, env, corsH) {
   for (const p of providers) {
     try {
       const reply = await p.fn(messages, env);
-      if (reply) return json({ reply, provider: p.name }, 200, corsH);
+      if (reply) return json({ reply: toTraditional(reply), provider: p.name }, 200, corsH);
     } catch (e) {
       console.warn(`${p.name} failed:`, e.message);
     }
@@ -172,6 +182,17 @@ async function handleTranscribe(req, env, corsH) {
     headers: { 'Authorization': `Bearer ${env.GROQ_API_KEY}` },
     body: out
   });
+
+  // Whisper 偶爾吐簡體 → 在 server 端統一轉繁
+  if (res.ok) {
+    try {
+      const data = await res.json();
+      if (data.text) data.text = toTraditional(data.text);
+      return json(data, 200, corsH);
+    } catch {
+      /* fallback to passthrough */
+    }
+  }
   const text = await res.text();
   return new Response(text, {
     status: res.status,
