@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>OG Card</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 1200px;
+      height: 630px;
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+      color: #2f2a3d;
+      overflow: hidden;
+    }
+    .card {
+      width: 1200px;
+      height: 630px;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(184,164,217,0.5) 0, transparent 40%),
+        radial-gradient(circle at 88% 88%, rgba(255,154,107,0.35) 0, transparent 35%),
+        linear-gradient(135deg, #fdf8ee 0%, #efe6f5 100%);
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 56px 64px;
+      gap: 48px;
+    }
+
+    /* 左側 ─ 文字主視覺 */
+    .left { display: flex; flex-direction: column; justify-content: space-between; }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+    .status-dot {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #34c759;
+      box-shadow: 0 0 0 6px rgba(52,199,89,0.18);
+    }
+    .brand-tag {
+      font-size: 18px;
+      letter-spacing: 4px;
+      color: #7c5fb8;
+      font-weight: 700;
+    }
+
+    h1 {
+      font-size: 88px;
+      line-height: 1.05;
+      font-weight: 900;
+      color: #5d3da3;
+      letter-spacing: 2px;
+      margin-bottom: 18px;
+    }
+    h1 .accent { color: #ff8454; }
+    h1 .sparkle { color: #ffb840; font-size: 0.7em; vertical-align: middle; }
+
+    .subtitle {
+      font-size: 28px;
+      font-weight: 500;
+      color: #5b5470;
+      letter-spacing: 1px;
+      margin-bottom: 36px;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 22px;
+      margin-bottom: auto;
+    }
+    .feat {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.85);
+      border: 2px solid rgba(124,95,184,0.15);
+      border-radius: 16px;
+      font-size: 22px;
+      font-weight: 500;
+      color: #2f2a3d;
+    }
+    .feat .emoji { font-size: 28px; }
+
+    .url-bar {
+      margin-top: 28px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      color: #5b5470;
+      padding: 12px 18px;
+      background: rgba(255,255,255,0.6);
+      border-radius: 12px;
+      width: fit-content;
+    }
+    .url-bar .lock { color: #34c759; font-weight: 700; }
+
+    /* 右側 ─ 平板模型 */
+    .right {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tablet {
+      width: 440px;
+      height: 530px;
+      background: #2f2a3d;
+      border-radius: 32px;
+      padding: 18px;
+      box-shadow:
+        0 20px 50px rgba(95, 70, 145, 0.35),
+        0 8px 16px rgba(0,0,0,0.1);
+      transform: rotate(-3deg);
+      position: relative;
+    }
+    .tablet::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: -6px;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 60px;
+      background: #1a1626;
+      border-radius: 2px;
+    }
+    .tablet-screen {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(170deg, #faf6ef 0%, #efe6f5 100%);
+      border-radius: 18px;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow: hidden;
+    }
+    .tab-topbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: #fffaf0;
+      border-radius: 12px;
+      border-bottom: 2px solid #e7dfd1;
+    }
+    .tab-topbar .dot { width: 10px; height: 10px; border-radius: 50%; background: #34c759; }
+    .tab-topbar .title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #7c5fb8;
+      letter-spacing: 0.5px;
+    }
+    .tab-topbar .icons { margin-left: auto; font-size: 12px; color: #5b5470; }
+
+    .tab-greeting {
+      font-size: 16px;
+      text-align: center;
+      color: #2f2a3d;
+      padding: 6px 0;
+      font-weight: 500;
+    }
+
+    .tab-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      flex: 1;
+    }
+    .tab-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 10px rgba(124, 95, 184, 0.1);
+      border: 2px solid transparent;
+    }
+    .tab-card .em { font-size: 30px; }
+    .tab-card .name { font-size: 14px; font-weight: 700; color: #7c5fb8; }
+    .tab-card .desc { font-size: 11px; color: #8b85a0; }
+
+    /* 裝飾元件 */
+    .decor {
+      position: absolute;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    .decor.tarot1 { top: 36px; right: 540px; font-size: 50px; transform: rotate(-12deg); }
+    .decor.tarot2 { top: 90px; right: 480px; font-size: 50px; transform: rotate(8deg); }
+    .decor.heart  { top: 220px; right: 60px; font-size: 36px; opacity: 0.5; }
+    .decor.spark1 { top: 380px; right: 30px; font-size: 28px; }
+    .decor.leaf1  { bottom: -20px; left: -20px; font-size: 90px; opacity: 0.4; transform: rotate(-15deg); }
+    .decor.leaf2  { bottom: -20px; right: -10px; font-size: 70px; opacity: 0.35; transform: rotate(20deg); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="left">
+      <div>
+        <div class="brand-row">
+          <span class="status-dot"></span>
+          <span class="brand-tag">SOCIAL CARE × AI</span>
+        </div>
+        <h1>
+          <span class="sparkle">✨</span> AI 塔羅<br>
+          心靈<span class="accent">陪伴站</span>
+        </h1>
+        <p class="subtitle">用科技與溫暖對話，陪伴社區長者</p>
+
+        <div class="features">
+          <div class="feat"><span class="emoji">🔮</span><span>AI 塔羅互動</span></div>
+          <div class="feat"><span class="emoji">💬</span><span>情緒關懷對話</span></div>
+          <div class="feat"><span class="emoji">✅</span><span>每日幸福任務</span></div>
+          <div class="feat"><span class="emoji">💝</span><span>心願祝福牆</span></div>
+        </div>
+      </div>
+
+      <div class="url-bar">
+        <span class="lock">●</span>
+        <span>yazelin.github.io/ai-tarot-companion</span>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="tablet">
+        <div class="tablet-screen">
+          <div class="tab-topbar">
+            <span class="dot"></span>
+            <span class="title">AI 塔羅心靈陪伴站</span>
+            <span class="icons">🔊 🔠</span>
+          </div>
+          <div class="tab-greeting">下午好 🍵 一起喝杯茶吧</div>
+          <div class="tab-grid">
+            <div class="tab-card"><span class="em">🔮</span><span class="name">抽一張牌</span><span class="desc">看看今天的小提醒</span></div>
+            <div class="tab-card"><span class="em">💬</span><span class="name">聊聊天</span><span class="desc">和亞澤聊聊</span></div>
+            <div class="tab-card"><span class="em">✅</span><span class="name">今日任務</span><span class="desc">一起做件小事</span></div>
+            <div class="tab-card"><span class="em">💝</span><span class="name">祝福牆</span><span class="desc">寫下你的心願</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <span class="decor tarot1">🌙</span>
+    <span class="decor tarot2">⭐</span>
+    <span class="decor heart">💜</span>
+    <span class="decor spark1">✨</span>
+    <span class="decor leaf1">🌿</span>
+    <span class="decor leaf2">🌷</span>
+  </div>
+</body>
+</html>
