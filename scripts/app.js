@@ -528,6 +528,12 @@
     checkAIStatus();
 
     bind();
+
+    // PWA shortcut：manifest.json 的 ?go=tarot|chat|task|wish 直接跳該頁
+    const target = new URLSearchParams(location.search).get('go');
+    if (target && ['tarot', 'chat', 'task', 'wish'].includes(target)) {
+      showScreen(target);
+    }
   }
 
   // Service Worker：網路優先，永遠拿最新檔；離線時退回快取

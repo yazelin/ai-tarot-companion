@@ -1,0 +1,41 @@
+{
+  "name": "AI 塔羅心靈陪伴站",
+  "short_name": "塔羅陪伴",
+  "description": "用科技與溫暖對話，陪伴社區長者。AI 塔羅、情緒陪伴、每日小任務、心願祝福牆。",
+  "lang": "zh-TW",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#faf6ef",
+  "theme_color": "#7c5fb8",
+  "categories": ["lifestyle", "health", "social"],
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "抽塔羅牌",
+      "short_name": "抽牌",
+      "url": "./?go=tarot",
+      "icons": [{ "src": "assets/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "聊聊天",
+      "short_name": "聊天",
+      "url": "./?go=chat",
+      "icons": [{ "src": "assets/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
