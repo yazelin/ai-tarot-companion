@@ -27,22 +27,18 @@ window.AIChat = (() => {
   // 使用方式（未來）：
   //   const reply = await AIChat.askClaude({ message, history });
   // 後端需提供 /api/chat 代理（避免在前端暴露金鑰）
-  async function askClaude({ message, history = [] } = {}) {
-    if (!window.CLAUDE_PROXY_URL) {
-      // 尚未設定後端代理 → 退回規則式
-      return freeTextReply(message);
-    }
+  // 走 Cloudflare Worker /chat（fallback chain：Groq → OpenRouter → Gemini）
+  // 沒設定 CHAT_API_URL 就退回規則式回覆
+  async function askClaude({ message, history = [], lastCard = null, recentMood = null } = {}) {
+    const url = window.CHAT_API_URL || window.CLAUDE_PROXY_URL;
+    if (!url) return freeTextReply(message);
     try {
-      const res = await fetch(window.CLAUDE_PROXY_URL, {
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message,
-          history,
-          system: '你是一位溫暖、耐心、專為長者設計的陪伴者。請使用簡單的繁體中文，避免艱澀詞彙，每段話不超過兩句。'
-        })
+        body: JSON.stringify({ message, history, lastCard, recentMood })
       });
-      if (!res.ok) throw new Error('proxy error');
+      if (!res.ok) throw new Error(`chat ${res.status}`);
       const data = await res.json();
       return data.reply || freeTextReply(message);
     } catch (e) {

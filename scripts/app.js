@@ -108,24 +108,49 @@
     log.scrollTop = log.scrollHeight;
   }
 
+  // 把聊天歷史轉成 worker 想要的格式（最多 6 輪）
+  function recentChatHistory() {
+    return $$('.chat-bubble').slice(-6).map(b => ({
+      role: b.classList.contains('user') ? 'user' : 'ai',
+      text: b.querySelector('.text')?.textContent || ''
+    }));
+  }
+
   async function sendUserMessage(text) {
     if (!text || !text.trim()) return;
     appendBubble('user', text.trim());
     $('#chatText').value = '';
-    // 模擬 AI 思考時間
-    await new Promise(r => setTimeout(r, 350));
-    const reply = await AIChat.askClaude({ message: text });
+    await new Promise(r => setTimeout(r, 200));
+    const reply = await AIChat.askClaude({
+      message: text,
+      history: recentChatHistory(),
+      lastCard: lastCard?.name || null,
+      recentMood: lastMood || null
+    });
     appendBubble('ai', reply);
     VoiceService.speak(reply);
   }
 
-  function handleMood(mood) {
+  let lastMood = null;
+
+  async function handleMood(mood) {
+    lastMood = mood;
     appendBubble('user', `今天感覺：${mood}`);
-    const reply = AIChat.moodReply(mood);
-    setTimeout(() => {
+    // 若有 Worker 後端 → 用 LLM 回覆，能延續上下文；否則退回規則式
+    if (window.CHAT_API_URL || window.CLAUDE_PROXY_URL) {
+      await new Promise(r => setTimeout(r, 200));
+      const reply = await AIChat.askClaude({
+        message: `我今天感覺有點${mood}`,
+        history: recentChatHistory(),
+        lastCard: lastCard?.name || null,
+        recentMood: mood
+      });
       appendBubble('ai', reply);
       VoiceService.speak(reply);
-    }, 350);
+    } else {
+      const reply = AIChat.moodReply(mood);
+      setTimeout(() => { appendBubble('ai', reply); VoiceService.speak(reply); }, 250);
+    }
   }
 
   // ---------- 今日任務 ----------

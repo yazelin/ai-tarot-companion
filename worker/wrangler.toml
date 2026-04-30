@@ -1,0 +1,14 @@
+name = "tarot-companion"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+
+# 不在這裡寫金鑰，用 wrangler secret put 上傳：
+#   wrangler secret put GROQ_API_KEY
+#   wrangler secret put OPENROUTER_API_KEY
+#   wrangler secret put GEMINI_API_KEY     （可選）
+
+[vars]
+# 公開設定（非機密）
+ALLOWED_ORIGINS = "https://yazelin.github.io,http://localhost:8765,http://localhost:8000"
+DEFAULT_LLM_MODEL = "llama-3.3-70b-versatile"
+DEFAULT_WHISPER_MODEL = "whisper-large-v3-turbo"
