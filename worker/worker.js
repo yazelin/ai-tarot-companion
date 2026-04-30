@@ -201,6 +201,120 @@ async function handleTranscribe(req, env, corsH) {
   });
 }
 
+// ---------- /tts (Edge TTS via WebSocket) ----------
+const EDGE_TTS_TOKEN = '6A5AA1D4EAFF4E9FB37E23D68491D6F4';
+
+function escapeXml(s) {
+  return s.replace(/[<>&"']/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' }[c]));
+}
+
+// MS 自 2024 年開始要求 Sec-MS-GEC token：SHA256(WinFileTime + TrustedClientToken)
+async function secMsGecToken() {
+  const TICKS_PER_SECOND = 10000000n;
+  const WIN_EPOCH = 11644473600n;
+  const ROUND = 3000000000n;            // 5 分鐘
+  const now = BigInt(Math.floor(Date.now() / 1000));
+  let ticks = (now + WIN_EPOCH) * TICKS_PER_SECOND;
+  ticks -= ticks % ROUND;
+  const data = `${ticks}${EDGE_TTS_TOKEN}`;
+  const buf = new TextEncoder().encode(data);
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+}
+
+async function edgeTTS(text, voice, rate, pitch) {
+  const reqId = crypto.randomUUID().replace(/-/g, '').toUpperCase();
+  // CF Workers fetch 不接受 wss://，要用 https:// 加 Upgrade header
+  const gec = await secMsGecToken();
+  const wsUrl = `https://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${EDGE_TTS_TOKEN}&Sec-MS-GEC=${gec}&Sec-MS-GEC-Version=1-130.0.2849.68&ConnectionId=${reqId}`;
+
+  const wsResp = await fetch(wsUrl, {
+    headers: {
+      'Upgrade': 'websocket',
+      'Origin': 'chrome-extension://jdiccldimpdaibmpdkjnbmckianbfold',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/130.0.0.0',
+      'Sec-MS-GEC': gec,
+      'Sec-MS-GEC-Version': '1-130.0.2849.68',
+      'Accept-Encoding': 'gzip, deflate, br',
+      'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8',
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache'
+    }
+  });
+  if (wsResp.status !== 101) {
+    const errText = await wsResp.text().catch(() => '');
+    throw new Error(`upgrade failed ${wsResp.status}: ${errText.slice(0, 100)}`);
+  }
+  const ws = wsResp.webSocket;
+  if (!ws) throw new Error('no webSocket on response');
+  ws.accept();
+
+  const ts = new Date().toISOString();
+  // 1) speech.config
+  ws.send(`X-Timestamp:${ts}\r\nContent-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n` +
+    `{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"false"},"outputFormat":"audio-24khz-48kbitrate-mono-mp3"}}}}`);
+
+  // 2) SSML
+  const ssml = `<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='zh-TW'><voice name='${voice}'><prosody pitch='${pitch}' rate='${rate}' volume='+0%'>${escapeXml(text)}</prosody></voice></speak>`;
+  ws.send(`X-RequestId:${reqId}\r\nContent-Type:application/ssml+xml\r\nPath:ssml\r\n\r\n${ssml}`);
+
+  // 3) 收訊 — text 訊息含元資料；binary 訊息頭 2 byte 是 header length（big-endian）
+  const chunks = [];
+  await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => { try { ws.close(); } catch (_) {} reject(new Error('tts timeout')); }, 30000);
+    ws.addEventListener('message', (event) => {
+      const d = event.data;
+      if (typeof d === 'string') {
+        if (d.includes('Path:turn.end')) {
+          clearTimeout(timeout);
+          try { ws.close(); } catch (_) {}
+          resolve();
+        }
+      } else {
+        // ArrayBuffer
+        const view = new DataView(d);
+        const headerLen = view.getUint16(0, false);   // big-endian
+        const audioBytes = new Uint8Array(d, 2 + headerLen);
+        if (audioBytes.length) chunks.push(audioBytes);
+      }
+    });
+    ws.addEventListener('close', () => { clearTimeout(timeout); resolve(); });
+    ws.addEventListener('error', (e) => { clearTimeout(timeout); reject(new Error('ws error')); });
+  });
+
+  // 串接所有片段
+  const total = chunks.reduce((s, c) => s + c.length, 0);
+  const out = new Uint8Array(total);
+  let off = 0;
+  for (const c of chunks) { out.set(c, off); off += c.length; }
+  return out;
+}
+
+async function handleTTS(req, env, corsH) {
+  let body;
+  try { body = await req.json(); } catch { return json({ error: 'invalid json' }, 400, corsH); }
+  const text = (body.text || '').trim().slice(0, 1000);
+  const voice = body.voice || 'zh-TW-YunJheNeural';
+  const rate = body.rate || '-10%';
+  const pitch = body.pitch || '+0Hz';
+  if (!text) return json({ error: 'text required' }, 400, corsH);
+
+  try {
+    const audio = await edgeTTS(text, voice, rate, pitch);
+    return new Response(audio, {
+      status: 200,
+      headers: {
+        'Content-Type': 'audio/mpeg',
+        'Cache-Control': 'public, max-age=86400',
+        ...corsH
+      }
+    });
+  } catch (e) {
+    console.error('tts error:', e);
+    return json({ error: 'tts failed: ' + e.message }, 502, corsH);
+  }
+}
+
 // ---------- /wishes ----------
 async function listWishes(req, env, corsH) {
   if (!env.DB) return json({ wishes: [] }, 200, corsH);
@@ -266,6 +380,7 @@ export default {
     }
     if (req.method === 'POST' && url.pathname === '/chat') return handleChat(req, env, corsH);
     if (req.method === 'POST' && url.pathname === '/transcribe') return handleTranscribe(req, env, corsH);
+    if (req.method === 'POST' && url.pathname === '/tts') return handleTTS(req, env, corsH);
     if (req.method === 'GET'  && url.pathname === '/wishes') return listWishes(req, env, corsH);
     if (req.method === 'POST' && url.pathname === '/wishes') return createWish(req, env, corsH);
 

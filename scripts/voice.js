@@ -15,8 +15,12 @@ window.VoiceService = (() => {
     if (!('speechSynthesis' in window)) return null;
     const voices = speechSynthesis.getVoices();
     if (!voices.length) return null;
+    // 優先順序：雲哲 → 曉雨 → 曉臻 → 任何 zh-TW → 任何中文 → 預設
     return (
-      voices.find(v => v.lang === 'zh-TW' && /female|woman/i.test(v.name)) ||
+      voices.find(v => /YunJhe/i.test(v.name)) ||         // 雲哲（男聲）
+      voices.find(v => /HsiaoYu/i.test(v.name)) ||        // 曉雨
+      voices.find(v => /HsiaoChen/i.test(v.name)) ||      // 曉臻
+      voices.find(v => v.lang === 'zh-TW' && /Male|男/i.test(v.name)) ||
       voices.find(v => v.lang === 'zh-TW') ||
       voices.find(v => v.lang === 'zh-CN') ||
       voices.find(v => v.lang.startsWith('zh')) ||
