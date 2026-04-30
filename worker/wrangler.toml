@@ -12,3 +12,8 @@ compatibility_date = "2026-01-01"
 ALLOWED_ORIGINS = "https://yazelin.github.io,http://localhost:8765,http://localhost:8000"
 DEFAULT_LLM_MODEL = "llama-3.3-70b-versatile"
 DEFAULT_WHISPER_MODEL = "whisper-large-v3-turbo"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tarot-wishes"
+database_id = "170db743-f463-47d1-83a0-7ccb4631baaa"

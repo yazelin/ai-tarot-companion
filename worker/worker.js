@@ -201,6 +201,50 @@ async function handleTranscribe(req, env, corsH) {
   });
 }
 
+// ---------- /wishes ----------
+async function listWishes(req, env, corsH) {
+  if (!env.DB) return json({ wishes: [] }, 200, corsH);
+  const url = new URL(req.url);
+  const limit = Math.min(Math.max(parseInt(url.searchParams.get('limit') || '50'), 1), 200);
+  try {
+    const { results } = await env.DB.prepare(
+      'SELECT id, name, text, created_at FROM wishes WHERE hidden=0 ORDER BY created_at DESC LIMIT ?'
+    ).bind(limit).all();
+    return json({ wishes: results || [] }, 200, corsH);
+  } catch (e) {
+    console.error('listWishes error:', e);
+    return json({ error: 'db error' }, 500, corsH);
+  }
+}
+
+async function createWish(req, env, corsH) {
+  if (!env.DB) return json({ error: 'DB not configured' }, 500, corsH);
+  let body;
+  try { body = await req.json(); } catch { return json({ error: 'invalid json' }, 400, corsH); }
+
+  const text = (body.text || '').trim().slice(0, 200);
+  let name = (body.name || '').trim().slice(0, 20);
+  if (!text || text.length < 1) return json({ error: 'text required' }, 400, corsH);
+  if (!name) name = '匿名';
+
+  // 統一用繁體存
+  const safeText = toTraditional(text);
+  const safeName = toTraditional(name);
+
+  const id = crypto.randomUUID();
+  const now = Date.now();
+
+  try {
+    await env.DB.prepare(
+      'INSERT INTO wishes (id, name, text, created_at) VALUES (?, ?, ?, ?)'
+    ).bind(id, safeName, safeText, now).run();
+    return json({ wish: { id, name: safeName, text: safeText, created_at: now } }, 201, corsH);
+  } catch (e) {
+    console.error('createWish error:', e);
+    return json({ error: 'db error' }, 500, corsH);
+  }
+}
+
 // ---------- Router ----------
 export default {
   async fetch(req, env) {
@@ -222,6 +266,8 @@ export default {
     }
     if (req.method === 'POST' && url.pathname === '/chat') return handleChat(req, env, corsH);
     if (req.method === 'POST' && url.pathname === '/transcribe') return handleTranscribe(req, env, corsH);
+    if (req.method === 'GET'  && url.pathname === '/wishes') return listWishes(req, env, corsH);
+    if (req.method === 'POST' && url.pathname === '/wishes') return createWish(req, env, corsH);
 
     return json({ error: 'not found' }, 404, corsH);
   }

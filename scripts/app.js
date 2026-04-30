@@ -271,35 +271,72 @@
     toast('已加入今天的小任務 ✅');
   }
 
-  // ---------- 祝福牆 ----------
+  // ---------- 祝福牆（遠端 D1 優先 + localStorage 備援） ----------
   const WISH_COLORS = ['#ffe1e1', '#ffe9c7', '#fffac2', '#d8f3dc', '#cfeafd', '#e8d6ff'];
 
-  function loadWishes() {
+  // 統一格式：{ name, text, ts }
+  function normalizeWish(w) {
+    return {
+      name: w.name || '匿名',
+      text: w.text || '',
+      ts: w.ts || w.created_at || Date.now()
+    };
+  }
+
+  function loadLocalWishes() {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.wishes) || '[]'); }
     catch (_) { return []; }
   }
 
-  function saveWish(wish) {
-    const list = loadWishes();
-    list.unshift(wish);
+  function cacheLocalWishes(list) {
     localStorage.setItem(STORAGE_KEYS.wishes, JSON.stringify(list.slice(0, 100)));
   }
 
-  function seedWishesIfEmpty() {
-    if (loadWishes().length) return;
-    const seeds = [
-      { name: '阿美阿嬤', text: '希望大家身體都健健康康！', ts: Date.now() - 86400000 },
-      { name: '老王', text: '祝孫子今年考試順利', ts: Date.now() - 7200000 },
-      { name: '春枝', text: '今天天氣很好，謝謝老天爺', ts: Date.now() - 3600000 },
-      { name: '阿福', text: '希望我太太膝蓋早點不痛', ts: Date.now() - 1800000 }
-    ];
-    localStorage.setItem(STORAGE_KEYS.wishes, JSON.stringify(seeds));
+  async function fetchRemoteWishes() {
+    if (!window.WISHES_API_URL) return null;
+    try {
+      const res = await fetch(window.WISHES_API_URL);
+      if (!res.ok) throw new Error(`status ${res.status}`);
+      const data = await res.json();
+      return (data.wishes || []).map(normalizeWish);
+    } catch (e) {
+      console.warn('fetchRemoteWishes failed:', e);
+      return null;
+    }
   }
 
-  function renderWishes() {
+  async function postRemoteWish({ name, text }) {
+    if (!window.WISHES_API_URL) return null;
+    try {
+      const res = await fetch(window.WISHES_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, text })
+      });
+      if (!res.ok) throw new Error(`status ${res.status}`);
+      const data = await res.json();
+      return data.wish ? normalizeWish(data.wish) : null;
+    } catch (e) {
+      console.warn('postRemoteWish failed:', e);
+      return null;
+    }
+  }
+
+  async function renderWishes() {
     const wall = $('#wishWall');
+    wall.innerHTML = '<div class="wishes-loading">載入中…</div>';
+
+    let list = await fetchRemoteWishes();
+    let isRemote = !!list;
+    if (!list) list = loadLocalWishes();   // 沒網路 → 用本機快取
+    else cacheLocalWishes(list);           // 有網路 → 順便更新本機快取
+
     wall.innerHTML = '';
-    loadWishes().forEach((w, i) => {
+    if (!list.length) {
+      wall.innerHTML = '<div class="wishes-loading">還沒有人貼祝福，要不要做第一個？💝</div>';
+      return;
+    }
+    list.forEach((w, i) => {
       const card = document.createElement('div');
       card.className = 'wish-card';
       card.style.background = WISH_COLORS[i % WISH_COLORS.length];
@@ -309,20 +346,40 @@
       card.querySelector('.signature').textContent = w.name ? `— ${w.name}` : '';
       wall.appendChild(card);
     });
+
+    if (!isRemote) {
+      const note = document.createElement('div');
+      note.className = 'wishes-loading';
+      note.textContent = '⚠️ 目前看到的是離線快取，連線後會更新';
+      wall.appendChild(note);
+    }
   }
 
-  function submitWish() {
+  async function submitWish() {
     const name = ($('#wishName').value || '').trim();
     const text = ($('#wishText').value || '').trim();
     if (!text) {
       toast('請先寫下您的祝福喔');
       return;
     }
-    saveWish({ name: name || '匿名', text, ts: Date.now() });
+    const sendBtn = $('#wishSubmit');
+    sendBtn.disabled = true;
+
+    const remote = await postRemoteWish({ name, text });
+    if (remote) {
+      // 順手把新的存到本機快取
+      cacheLocalWishes([remote, ...loadLocalWishes()]);
+      toast('已貼上祝福牆 💝');
+    } else {
+      // 離線時也讓使用者看到自己貼的
+      cacheLocalWishes([{ name: name || '匿名', text, ts: Date.now() }, ...loadLocalWishes()]);
+      toast('離線中：已存在這台裝置，連線後會自動同步');
+    }
+
     $('#wishName').value = '';
     $('#wishText').value = '';
-    renderWishes();
-    toast('已貼上祝福牆 💝');
+    sendBtn.disabled = false;
+    await renderWishes();
     VoiceService.speak('謝謝您的祝福，已經貼上去了');
   }
 
@@ -466,8 +523,7 @@
     // 預設聊天頁第一句 AI 招呼
     appendBubble('ai', '您好，我是亞澤，您的陪伴小幫手。今天感覺怎麼樣呢？您可以按下面的按鈕，或直接打字告訴我。');
 
-    seedWishesIfEmpty();
-    renderWishes();
+    renderWishes();   // async，不 await 也沒關係，UI 會自己更新
     renderTasks();
     checkAIStatus();
 

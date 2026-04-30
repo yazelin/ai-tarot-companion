@@ -607,6 +607,14 @@ main {
   gap: 16px;
 }
 
+.wishes-loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 24px 12px;
+  color: var(--ink-soft);
+  font-size: 0.95em;
+}
+
 .wish-card {
   padding: 18px;
   border-radius: 14px;
