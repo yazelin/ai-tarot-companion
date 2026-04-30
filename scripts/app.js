@@ -17,6 +17,9 @@
     $$('.screen').forEach(s => s.classList.toggle('active', s.dataset.screen === name));
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (name !== 'chat') VoiceService.stop();
+    if (name === 'task') renderTasks();
+    if (name === 'wish') renderWishes();
+    if (name === 'tarot') resetTarotStage();
   }
 
   // ---------- Toast ----------
@@ -193,6 +196,7 @@
     }
     items.push({ ...lastCard.task, from: lastCard.name, done: false });
     saveTasks(items);
+    renderTasks();
     toast('已加入今天的小任務 ✅');
   }
 
