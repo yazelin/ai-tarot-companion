@@ -10,14 +10,13 @@
 <body>
   <header class="topbar">
     <div class="brand">
-      <span class="brand-emoji" aria-hidden="true">✨</span>
+      <span id="aiStatus" class="brand-status checking" role="button" tabindex="0" title="AI 連線狀態（點擊重新檢查）">
+        <span class="dot"></span>
+        <span class="label" hidden>檢查中</span>
+      </span>
       <h1>AI 塔羅心靈陪伴站</h1>
     </div>
     <div class="topbar-actions">
-      <span id="aiStatus" class="ai-status checking" title="AI 連線狀態">
-        <span class="dot"></span>
-        <span class="label">檢查中</span>
-      </span>
       <button id="voiceToggle" class="icon-btn" aria-pressed="true" title="開關語音朗讀">
         <span class="icon">🔊</span>
         <span class="label">語音開</span>
@@ -102,8 +101,8 @@
         <button class="mood-btn" data-mood="平靜">😌 還算平靜</button>
       </div>
       <div class="chat-input-row">
-        <button id="micBtn" class="big-btn ghost" title="按住說話（即將推出）">
-          <span class="emoji">🎤</span> 按住說話
+        <button id="micBtn" class="big-btn ghost" title="點一下開始錄音">
+          <span class="emoji">🎤</span><span class="btn-text"> 按一下說話</span>
         </button>
         <input id="chatText" class="chat-text" placeholder="或在這裡打字…" />
         <button id="chatSendBtn" class="big-btn primary">送出</button>

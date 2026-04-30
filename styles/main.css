@@ -107,13 +107,13 @@ input, textarea {
   font-size: 1.2em;
 }
 
-/* AI 狀態小燈 — 只一個圓點，點擊重新檢查連線 */
-.ai-status {
+/* AI 狀態 / brand 標誌（取代 ✨）—— 一個彩色圓點，點擊重新檢查連線 */
+.brand-status {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   background: transparent;
   border: none;
@@ -121,22 +121,25 @@ input, textarea {
   user-select: none;
   border-radius: 50%;
   transition: background 0.2s;
+  flex-shrink: 0;
 }
-.ai-status:hover { background: rgba(124, 95, 184, 0.08); }
-.ai-status .label { display: none; }    /* 文字一律隱藏 */
-.ai-status .dot {
-  width: 12px;
-  height: 12px;
+.brand-status:hover, .brand-status:focus-visible {
+  background: rgba(124, 95, 184, 0.1);
+  outline: none;
+}
+.brand-status .dot {
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: #c5c0d0;
 }
-.ai-status.online .dot {
+.brand-status.online .dot {
   background: #34c759;
   animation: pulse 2.5s infinite;
 }
-.ai-status.offline .dot { background: #ffaa33; }
-.ai-status.error   .dot { background: #ff5b5b; }
-.ai-status.checking .dot { background: #c5c0d0; animation: pulse 1s infinite; }
+.brand-status.offline .dot { background: #ffaa33; }
+.brand-status.error   .dot { background: #ff5b5b; }
+.brand-status.checking .dot { background: #c5c0d0; animation: pulse 1s infinite; }
 
 @keyframes pulse {
   0%   { box-shadow: 0 0 0 0   rgba(52,199,89,0.5); }
@@ -649,11 +652,13 @@ main {
   .menu-emoji { font-size: 2.6em; }
   .card-back, .card-front { width: 170px; height: 250px; }
 
-  /* 聊天輸入列：手機上把麥克風按鈕縮成只剩 emoji */
-  .chat-input-row { gap: 8px; }
-  .chat-text { flex: 1 1 0; min-width: 0; }
-  .big-btn { padding: 14px 18px; }
+  /* 聊天輸入列：手機上把麥克風按鈕縮成只剩 emoji，textbox 拉滿剩餘空間 */
+  .chat-input-row { gap: 6px; flex-wrap: nowrap; }
+  .chat-text { flex: 1 1 0; min-width: 0; padding: 12px 14px; }
+  #micBtn .btn-text { display: none; }                /* 麥克風只剩 🎤 */
+  #micBtn { padding: 14px; min-width: 56px; flex-shrink: 0; }
   #micBtn .emoji { font-size: 1.4em; }
+  #chatSendBtn { padding: 14px 18px; flex-shrink: 0; }
 
   /* 心情按鈕兩欄 */
   .mood-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
