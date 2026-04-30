@@ -1,0 +1,574 @@
+:root {
+  --bg: #faf6ef;
+  --bg-soft: #fffaf0;
+  --ink: #2f2a3d;
+  --ink-soft: #5b5470;
+  --primary: #7c5fb8;
+  --primary-soft: #b8a4d9;
+  --accent: #ff9a6b;
+  --accent-soft: #ffd4bf;
+  --warm: #ffe1b3;
+  --line: #e7dfd1;
+  --card: #ffffff;
+  --shadow: 0 6px 20px rgba(124, 95, 184, 0.12);
+  --radius: 18px;
+  --base: 22px;
+}
+
+[data-fontsize="large"] {
+  --base: 26px;
+}
+
+[data-fontsize="xlarge"] {
+  --base: 30px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-size: var(--base);
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  background: linear-gradient(160deg, var(--bg) 0%, #efe6f5 100%);
+  color: var(--ink);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+}
+
+input, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Topbar */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 28px;
+  background: var(--bg-soft);
+  border-bottom: 2px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-emoji {
+  font-size: 1.6em;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 1.3em;
+  color: var(--primary);
+  letter-spacing: 1px;
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  color: var(--ink-soft);
+  transition: all 0.2s;
+}
+
+.icon-btn:hover {
+  border-color: var(--primary-soft);
+  background: #fff;
+}
+
+.icon-btn[aria-pressed="false"] {
+  opacity: 0.5;
+}
+
+.icon-btn .icon {
+  font-size: 1.2em;
+}
+
+/* Main / screens */
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+
+.screen {
+  display: none;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.screen.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 1em;
+  padding: 8px 0;
+  margin-bottom: 16px;
+}
+
+.back-btn:hover {
+  text-decoration: underline;
+}
+
+.screen-title {
+  font-size: 1.6em;
+  color: var(--primary);
+  margin: 0 0 24px;
+  text-align: center;
+}
+
+/* Home */
+.greeting {
+  font-size: 1.5em;
+  text-align: center;
+  margin: 24px 0 40px;
+  color: var(--ink);
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.menu-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 36px 24px;
+  background: var(--card);
+  border: 3px solid transparent;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  transition: all 0.2s;
+  min-height: 200px;
+}
+
+.menu-card:hover, .menu-card:focus {
+  transform: translateY(-4px);
+  border-color: var(--primary-soft);
+  outline: none;
+}
+
+.menu-emoji {
+  font-size: 3em;
+  line-height: 1;
+}
+
+.menu-title {
+  font-size: 1.3em;
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.menu-sub {
+  font-size: 0.9em;
+  color: var(--ink-soft);
+}
+
+/* Big button */
+.big-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 32px;
+  background: var(--card);
+  border: 3px solid var(--line);
+  border-radius: 14px;
+  color: var(--ink);
+  font-size: 1.1em;
+  transition: all 0.2s;
+}
+
+.big-btn:hover {
+  border-color: var(--primary-soft);
+  background: var(--bg-soft);
+}
+
+.big-btn.primary {
+  background: linear-gradient(135deg, var(--primary), #9579cf);
+  color: #fff;
+  border-color: transparent;
+}
+
+.big-btn.primary:hover {
+  filter: brightness(1.05);
+}
+
+.big-btn.ghost {
+  background: transparent;
+  border-style: dashed;
+}
+
+.big-btn .emoji {
+  font-size: 1.3em;
+}
+
+/* Tarot */
+.tarot-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  padding: 24px;
+}
+
+.card-back, .card-front {
+  width: 220px;
+  height: 320px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: transform 0.6s;
+}
+
+.card-back {
+  background: linear-gradient(135deg, #4a3a7a, #7c5fb8);
+  color: #ffe;
+  border: 4px solid var(--warm);
+}
+
+.card-back-pattern {
+  font-size: 1.8em;
+  letter-spacing: 4px;
+}
+
+.card-front {
+  background: linear-gradient(160deg, #fff, var(--bg-soft));
+  border: 4px solid var(--accent);
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+.card-image {
+  font-size: 5em;
+  line-height: 1;
+}
+
+.card-name {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: var(--primary);
+  text-align: center;
+}
+
+.tarot-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.tarot-result.hidden {
+  display: none;
+}
+
+.card-reading {
+  max-width: 700px;
+  background: var(--card);
+  padding: 24px 28px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.reading-headline {
+  font-size: 1.3em;
+  color: var(--accent);
+  margin: 0 0 12px;
+  font-weight: bold;
+}
+
+.reading-body {
+  font-size: 1.05em;
+  color: var(--ink);
+  margin: 0;
+  line-height: 1.8;
+}
+
+.card-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Chat */
+.chat-log {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  min-height: 240px;
+  max-height: 360px;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+.chat-bubble {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  align-items: flex-start;
+}
+
+.chat-bubble.user {
+  flex-direction: row-reverse;
+}
+
+.chat-bubble .avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--primary-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3em;
+  flex-shrink: 0;
+}
+
+.chat-bubble.user .avatar {
+  background: var(--accent-soft);
+}
+
+.chat-bubble .text {
+  background: var(--bg-soft);
+  padding: 12px 18px;
+  border-radius: 14px;
+  max-width: 75%;
+  line-height: 1.6;
+}
+
+.chat-bubble.user .text {
+  background: var(--warm);
+}
+
+.mood-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.mood-btn {
+  padding: 14px;
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  font-size: 0.95em;
+  transition: all 0.2s;
+}
+
+.mood-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  transform: translateY(-2px);
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.chat-text {
+  flex: 1;
+  min-width: 200px;
+  padding: 14px 18px;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+}
+
+.chat-text:focus {
+  outline: none;
+  border-color: var(--primary-soft);
+}
+
+/* Task */
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border-left: 6px solid var(--accent);
+}
+
+.task-item.done {
+  opacity: 0.55;
+  border-left-color: var(--primary-soft);
+}
+
+.task-item.done .task-text {
+  text-decoration: line-through;
+}
+
+.task-emoji {
+  font-size: 2em;
+}
+
+.task-text {
+  flex: 1;
+  font-size: 1.1em;
+}
+
+.task-check {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid var(--primary-soft);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.task-item.done .task-check {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* Wish wall */
+.wish-compose {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--card);
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 28px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.wish-text {
+  padding: 14px 18px;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  resize: vertical;
+  min-height: 90px;
+  background: var(--bg-soft);
+}
+
+.wish-wall {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.wish-card {
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+  position: relative;
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transform: rotate(var(--rot, 0deg));
+}
+
+.wish-card .body {
+  font-size: 1em;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.wish-card .signature {
+  margin-top: 12px;
+  font-size: 0.85em;
+  color: var(--ink-soft);
+  text-align: right;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--ink);
+  color: #fff;
+  padding: 14px 24px;
+  border-radius: 14px;
+  font-size: 1em;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s;
+  z-index: 100;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  :root { --base: 19px; }
+  .topbar { padding: 12px 16px; }
+  .brand h1 { font-size: 1.1em; }
+  .icon-btn .label { display: none; }
+  main { padding: 20px 14px 80px; }
+  .menu-card { min-height: 160px; padding: 24px 16px; }
+  .card-back, .card-front { width: 180px; height: 260px; }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "tarot-companion-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node proxy.js",
+    "dev": "node --watch proxy.js"
+  },
+  "dependencies": {
+    "msedge-tts": "^1.3.4"
+  }
+}
