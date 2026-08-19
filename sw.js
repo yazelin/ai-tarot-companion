@@ -2,7 +2,7 @@
 // 目的：每次有網路就拿最新檔，瀏覽器再也不需要靠 ?v= 破快取
 // 副作用：完全離線時自動退回上次快取的版本
 
-const CACHE = 'tarot-companion-v1';
+const CACHE = 'tarot-companion-v2';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
@@ -31,6 +31,7 @@ self.addEventListener('fetch', (e) => {
         }
         return res;
       })
-      .catch(() => caches.match(e.request))
+      // 帶 query 的路由(?go=tarot、?utm=)離線時用寬鬆比對回查,避免 miss 掉到錯頁
+      .catch(() => caches.match(e.request, { ignoreSearch: true, ignoreVary: true }))
   );
 });
