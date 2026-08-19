@@ -3,6 +3,7 @@
   "short_name": "塔羅陪伴",
   "description": "用科技與溫暖對話，陪伴社區長者。AI 塔羅、情緒陪伴、每日小任務、心願祝福牆。",
   "lang": "zh-TW",
+  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -36,6 +37,22 @@
       "short_name": "聊天",
       "url": "./?go=chat",
       "icons": [{ "src": "assets/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "images/screenshot-mobile.webp",
+      "sizes": "1170x1992",
+      "type": "image/webp",
+      "form_factor": "narrow",
+      "label": "手機版首頁：抽塔羅牌、聊聊天、每日任務、祝福牆"
+    },
+    {
+      "src": "images/screenshot-desktop.webp",
+      "sizes": "1280x800",
+      "type": "image/webp",
+      "form_factor": "wide",
+      "label": "桌面版首頁：抽塔羅牌、聊聊天、每日任務、祝福牆"
     }
   ]
 }
